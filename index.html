@@ -5,46 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Overlay IRL – jeden URL</title>
   <style>
-    /* Cała strona transparentna pod YoloBox/OBS */
     html, body { height: 100%; }
     body {
       margin: 0;
-      background: transparent; /* ważne! */
+      background: transparent;
       overflow: hidden;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
-    /* Płótno 16:9, responsywne, zakotwiczone do ekranu */
     .stage {
       position: fixed;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
       width: 100vw;
-      height: 56.25vw;     /* 9/16 = 0.5625 */
+      height: 56.25vw;
       max-height: 100vh;
-      max-width: 177.78vh; /* 16/9 = 1.7778 */
+      max-width: 177.78vh;
       aspect-ratio: 16/9;
-      pointer-events: none; /* żeby nie łapało klików na Yolo */
+      pointer-events: none;
     }
 
     .box {
       position: absolute;
-      pointer-events: auto; /* iframe’y mogą nadal reagować jeśli trzeba */
+      pointer-events: auto;
     }
 
-    /* ROGI i centrum – pozycje jak na Twoim screenie */
     .top-left     { left: 24px;  top: 24px; }
     .bottom-left  { left: 24px;  bottom: 24px; }
     .bottom-right { right: 24px; bottom: 24px; }
     .center       { left: 50%;  top: 50%; transform: translate(-50%, -50%); }
 
-    /* Rozmiary okienek – możesz tweekować na żywo w GitHubie */
-    .w-medium { width: 520px; height: 140px; }
-    .w-wide   { width: 720px; height: 180px; }
-    .w-small  { width: 420px; height: 120px; }
+    /* Poszerzyłem iframy żeby nie przycinało tekstu */
+    .w-medium { width: 620px; height: 160px; }
+    .w-wide   { width: 760px; height: 200px; }
+    .w-small  { width: 480px; height: 140px; }
 
-    /* Ramki iframów zawsze przezroczyste */
     .box iframe {
       width: 100%;
       height: 100%;
@@ -52,15 +48,11 @@
       background: transparent;
     }
 
-    /* Warstwy – alert nad innymi (żeby był widoczny podczas animacji) */
     #tipAlert  { z-index: 30; }
     #botrix    { z-index: 20; }
     #topDonate { z-index: 10; }
     #lastDonate{ z-index: 10; }
     #goal      { z-index: 10; }
-
-    /* Opcjonalnie: delikatne safe-area na ultrawide/niestandardowych kadrach */
-    .safePadding { inset: 16px; }
   </style>
 </head>
 <body>
@@ -76,7 +68,7 @@
         allowtransparency="true"></iframe>
     </div>
 
-    <!-- TIP ALERT – też centrum, wyższy z-index, możesz zwęzić/szerzej -->
+    <!-- TIP ALERT – centrum -->
     <div id="tipAlert" class="box center w-wide" style="top: calc(50% + 120px);">
       <iframe
         title="Tipply Tip Alert"
@@ -86,8 +78,8 @@
         allowtransparency="true"></iframe>
     </div>
 
-    <!-- TOP DONATE – lewy górny róg -->
-    <div id="topDonate" class="box top-left w-medium">
+    <!-- TOP DONATE – lewy górny róg, powiększone okno -->
+    <div id="topDonate" class="box top-left w-wide" style="height: 220px;">
       <iframe
         title="Tipply Top Donate"
         src="https://widgets.tipply.pl/LARGEST_MESSAGES/45acbc83-f00e-41a6-bbcd-4e8078ae7923/7e2ac059-e6d8-448f-8a00-99a8bbd85780"
@@ -117,20 +109,5 @@
     </div>
 
   </div>
-
-  <!-- Drobny helper: jeżeli ktoś odpalił stronę w przeglądarce, pokaż info o 16:9 -->
-  <script>
-    (function() {
-      const warn = () => {
-        const ar = window.innerWidth / window.innerHeight;
-        const ok = Math.abs(ar - 16/9) < 0.06; // tolerancja ~6%
-        if (!ok) {
-          console.log("Tip: Overlay projektowany pod 16:9 (1920x1080). W YoloBox/OBS będzie się skalować poprawnie.");
-        }
-      };
-      window.addEventListener('resize', warn);
-      warn();
-    })();
-  </script>
 </body>
 </html>
