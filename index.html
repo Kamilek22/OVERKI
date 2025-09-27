@@ -6,104 +6,77 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Overlay IRL – jeden URL</title>
   <style>
-    :root { --align-bottom: -46px; } /* why: identyczna wysokość elementów przy dolnej krawędzi */
+    :root { --align-bottom: -46px; } /* why: równa wysokość z #lastDonate */
 
     html, body { height: 100%; }
-    body {
-      margin: 0;
-      background: transparent;
-      overflow: hidden;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    }
+    body { margin: 0; background: transparent; overflow: hidden;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
 
     .root { position: fixed; inset: 0; display: grid; place-items: center; }
-    .canvas {
-      position: relative;
-      width: 1920px;
-      height: 1080px;
-      transform-origin: top left;
-      background: transparent;
-    }
+    .canvas { position: relative; width: 1920px; height: 1080px; transform-origin: top left; background: transparent; }
 
     .box { position: absolute; pointer-events: auto; background: transparent; }
-    .top-left     { left: 24px;  top: 24px; }
-    .bottom-left  { left: 24px;  bottom: 24px; }
-    .bottom-right { right: 24px; bottom: 24px; }
-    .center       { left: 50%;  top: 50%; transform: translate(-50%, -50%); }
+    .top-left{ left:24px; top:24px; }
+    .bottom-left{ left:24px; bottom:24px; }
+    .bottom-right{ right:24px; bottom:24px; }
+    .center{ left:50%; top:50%; transform:translate(-50%,-50%); }
+    .cover-full{ left:50%; top:50%; width:1920px; height:1080px; transform:translate(-50%,-50%); pointer-events:none; } /* why: nie zasłaniają */
 
-    .cover-full { left: 50%; top: 50%; width: 1920px; height: 1080px; transform: translate(-50%, -50%); }
-
-    .box iframe { width: 100%; height: 100%; border: 0; background: transparent; }
+    .box iframe { width:100%; height:100%; border:0; background:transparent; }
 
     /* warstwy */
     #botrix     { z-index: 20; }
     #tipAlert   { z-index: 30; }
     #topDonate  { z-index: 10; }
     #lastDonate { z-index: 10; }
-    #goal       { z-index: 50; } /* wyżej niż full-screen alerty */
+    #goal       { z-index: 9999; } /* na wierzchu wszystkiego */
 
-    /* debug: włącz przez ?debug=1 */
-    .debug .box { outline: 1px dashed rgba(255,0,0,.6); outline-offset: -1px; }
-
-    /* badge fallback jeśli iframe się nie załaduje */
-    .badge {
-      position: absolute; inset: 6px auto auto 6px;
-      font: 600 12px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color: #fff; background: rgba(0,0,0,.5);
-      padding: 6px 8px; border-radius: 8px;
-      pointer-events: none;
-    }
-    .hidden { display: none; }
+    /* debug */
+    .debug .box { outline: 1px dashed rgba(255,0,0,.6); outline-offset:-1px; }
   </style>
 </head>
 <body>
   <div class="root">
     <div id="canvas" class="canvas">
 
-      <!-- BOTRIX – pełny -->
+      <!-- BOTRIX (full) -->
       <div id="botrix" class="box cover-full">
-        <iframe title="Botrix Alerts"
-          src="https://botrix.live/alerts?bid=mImY0SOSfEEnIbMs4UPHNg"
+        <iframe id="if-botrix" title="Botrix Alerts"
+          src=""
           allow="autoplay; clipboard-read; clipboard-write"
-          referrerpolicy="no-referrer"
           allowtransparency="true"></iframe>
       </div>
 
-      <!-- TIP ALERT – pełny -->
+      <!-- TIP ALERT (full) -->
       <div id="tipAlert" class="box cover-full">
-        <iframe title="Tipply Tip Alert"
-          src="https://widgets.tipply.pl/TIP_ALERT/45acbc83-f00e-41a6-bbcd-4e8078ae7923"
+        <iframe id="if-tip" title="Tipply Tip Alert"
+          src=""
           allow="autoplay; clipboard-read; clipboard-write; microphone; speakers"
-          referrerpolicy="no-referrer"
           allowtransparency="true"></iframe>
       </div>
 
-      <!-- TOP DONATE – lewy górny (zmniejszone + przesunięte) -->
-      <div id="topDonate" class="box" style="width: 860px; height: 220px; top: -16px; left: 4px;">
-        <iframe title="Tipply Top Donate"
-          src="https://widgets.tipply.pl/LARGEST_MESSAGES/45acbc83-f00e-41a6-bbcd-4e8078ae7923/7e2ac059-e6d8-448f-8a00-99a8bbd85780"
+      <!-- TOP DONATE (LT) -->
+      <div id="topDonate" class="box" style="width:860px; height:220px; top:-16px; left:4px;">
+        <iframe id="if-top" title="Tipply Top Donate"
+          src=""
           allow="autoplay; clipboard-read; clipboard-write"
-          referrerpolicy="no-referrer"
           allowtransparency="true"></iframe>
       </div>
 
-      <!-- LAST DONATE – prawy dolny -->
-      <div id="lastDonate" class="box bottom-right" style="width: 600px; height: 140px; bottom: var(--align-bottom);">
-        <iframe title="Tipply Last Donate"
-          src="https://widgets.tipply.pl/LATEST_MESSAGES/45acbc83-f00e-41a6-bbcd-4e8078ae7923/8bb96f04-e8dc-4b7e-8e68-a032c3335840"
+      <!-- LAST DONATE (RB) -->
+      <div id="lastDonate" class="box bottom-right" style="width:600px; height:140px; bottom:var(--align-bottom);">
+        <iframe id="if-last" title="Tipply Last Donate"
+          src=""
           allow="autoplay; clipboard-read; clipboard-write"
-          referrerpolicy="no-referrer"
           allowtransparency="true"></iframe>
       </div>
 
-      <!-- GOAL – lewy dolny, równolegle do LAST DONATE -->
-      <div id="goal" class="box bottom-left" style="width: 640px; height: 140px; bottom: var(--align-bottom);">
-        <!-- why: większy rozmiar i wyższy z-index, żeby było na pewno widoczne -->
-        <span id="goal-badge" class="badge hidden">Ładowanie GOAL…</span>
-        <iframe id="goal-iframe" title="Tipply Goal"
-          src="https://widgets.tipply.pl/TIPS_GOAL/45acbc83-f00e-41a6-bbcd-4e8078ae7923/GOAL/284aa312-53e1-460c-8424-70880828c41b"
+      <!-- GOAL (LB) -->
+      <div id="goal" class="box bottom-left" style="width:640px; height:140px; bottom:var(--align-bottom);">
+        <iframe id="if-goal" title="Tipply Goal"
+          src=""
+          loading="eager"
           allow="autoplay; clipboard-read; clipboard-write"
-          referrerpolicy="no-referrer"
           allowtransparency="true"></iframe>
       </div>
 
@@ -114,7 +87,6 @@
     (function() {
       const canvas = document.getElementById('canvas');
 
-      // skalowanie 1080p do okna
       function fit() {
         const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
         const x = (window.innerWidth  - 1920 * scale) / 2;
@@ -124,25 +96,38 @@
       window.addEventListener('resize', fit);
       fit();
 
-      // tryb debug (?debug=1 → czerwone obrysy)
-      if (new URLSearchParams(location.search).get('debug') === '1') {
-        document.body.classList.add('debug');
+      const qs = new URLSearchParams(location.search);
+      if (qs.get('debug') === '1') document.body.classList.add('debug');
+
+      // anty-cache + bezpieczne łączenie parametrów
+      function withTs(url) {
+        const u = new URL(url, location.href);
+        u.searchParams.set('_ts', Date.now().toString());
+        return u.toString();
       }
 
-      // prosty fallback: pokaż badge, jeśli iframe nie zawoła onload w sensownym czasie
-      const goalIframe = document.getElementById('goal-iframe');
-      const goalBadge  = document.getElementById('goal-badge');
-      let goalLoaded = false;
-      goalIframe.addEventListener('load', function() {
-        goalLoaded = true;
-        goalBadge.classList.add('hidden');
-      });
-      setTimeout(() => {
-        if (!goalLoaded) {
-          goalBadge.textContent = 'GOAL nie załadował się – sprawdź URL lub blokery';
-          goalBadge.classList.remove('hidden');
-        }
-      }, 4000);
+      // ustaw src (z _ts) dla wszystkich iframe
+      const urls = {
+        botrix: 'https://botrix.live/alerts?bid=mImY0SOSfEEnIbMs4UPHNg',
+        tip:    'https://widgets.tipply.pl/TIP_ALERT/45acbc83-f00e-41a6-bbcd-4e8078ae7923',
+        top:    'https://widgets.tipply.pl/LARGEST_MESSAGES/45acbc83-f00e-41a6-bbcd-4e8078ae7923/7e2ac059-e6d8-448f-8a00-99a8bbd85780',
+        last:   'https://widgets.tipply.pl/LATEST_MESSAGES/45acbc83-f00e-41a6-bbcd-4e8078ae7923/8bb96f04-e8dc-4b7e-8e68-a032c3335840',
+        goal:   'https://widgets.tipply.pl/TIPS_GOAL/45acbc83-f00e-41a6-bbcd-4e8078ae7923/GOAL/284aa312-53e1-460c-8424-70880828c41b'
+      };
+      document.getElementById('if-botrix').src = withTs(urls.botrix);
+      document.getElementById('if-tip').src    = withTs(urls.tip);
+      document.getElementById('if-top').src    = withTs(urls.top);
+      document.getElementById('if-last').src   = withTs(urls.last);
+      document.getElementById('if-goal').src   = withTs(urls.goal);
+
+      // tryb solo: ?solo=goal (IZOLUJE #goal)
+      const solo = qs.get('solo');
+      if (solo) {
+        for (const el of document.querySelectorAll('.box')) el.style.display = 'none';
+        const soloMap = { goal: '#goal', last: '#lastDonate', top: '#topDonate', tip: '#tipAlert', botrix: '#botrix' };
+        const pick = soloMap[solo];
+        if (pick) document.querySelector(pick).style.display = 'block';
+      }
     })();
   </script>
 </body>
