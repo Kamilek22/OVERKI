@@ -8,56 +8,48 @@
     html, body { height: 100%; }
     body {
       margin: 0;
-      background: transparent;
+      background: transparent; /* ważne */
       overflow: hidden;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
-    .stage {
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 100vw;
-      height: 56.25vw;
-      max-height: 100vh;
-      max-width: 177.78vh;
-      aspect-ratio: 16/9;
-      pointer-events: none;
-      overflow: visible; /* pozwól zawartości mieć pełny obszar */
+    /* --- System współrzędnych 1920x1080 ---
+       Cały layout rysujemy w pikselach sceny 1080p.
+       Potem SKALUJEMY całość JS-em, więc widgety widzą pełne 1920x1080
+       i nie przycinają się wewnątrz. */
+    .root { position: fixed; inset: 0; display: grid; place-items: center; }
+    .canvas {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      transform-origin: top left;
+      background: transparent;
     }
 
-    .box {
-      position: absolute;
-      pointer-events: auto;
-    }
+    /* Pudełka – pozycje w przestrzeni 1920x1080 */
+    .box { position: absolute; pointer-events: auto; background: transparent; }
 
-    /* Pełny obszar 16:9 (ok. 1920x1080 względem sceny) dla animowanych alertów */
-    .cover-all {
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      transform: none;
-    }
-
+    /* ROGI i centrum */
     .top-left     { left: 24px;  top: 24px; }
     .bottom-left  { left: 24px;  bottom: 24px; }
     .bottom-right { right: 24px; bottom: 24px; }
     .center       { left: 50%;  top: 50%; transform: translate(-50%, -50%); }
 
-    /* Poszerzyłem iframy żeby nie przycinało tekstu */
+    /* Rozmiary (w pikselach 1080p) */
     .w-medium { width: 620px; height: 160px; }
-    .w-wide   { width: 760px; height: 200px; }
-    .w-small  { width: 480px; height: 140px; }
+    .w-wide   { width: 900px; height: 240px; }
+    .w-small  { width: 520px; height: 140px; }
+
+    /* Pełny obszar dla animowanych alertów */
+    .cover-full { left: 0; top: 0; width: 1920px; height: 1080px; transform: none; }
 
     .box iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      background: transparent;
+      width: 100%; height: 100%; border: 0; background: transparent;
+      /* Wymuszenie braku przycinania po stronie iframe */
+      overflow: visible;
     }
 
+    /* Warstwy */
     #tipAlert  { z-index: 30; }
     #botrix    { z-index: 20; }
     #topDonate { z-index: 10; }
@@ -66,58 +58,71 @@
   </style>
 </head>
 <body>
-  <div class="stage" role="presentation">
+  <div class="root">
+    <div id="canvas" class="canvas">
 
-    <!-- BOTRIX – wyśrodkowany -->
-    <div id="botrix" class="box cover-all">
-      <iframe
-        title="Botrix Alerts"
-        src="https://botrix.live/alerts?bid=mImY0SOSfEEnIbMs4UPHNg"
-        allow="autoplay; clipboard-read; clipboard-write"
-        referrerpolicy="no-referrer"
-        allowtransparency="true"></iframe>
+      <!-- BOTRIX – pełna scena 1920x1080 -->
+      <div id="botrix" class="box cover-full">
+        <iframe title="Botrix Alerts"
+          src="https://botrix.live/alerts?bid=mImY0SOSfEEnIbMs4UPHNg"
+          allow="autoplay; clipboard-read; clipboard-write"
+          referrerpolicy="no-referrer"
+          allowtransparency="true"></iframe>
+      </div>
+
+      <!-- TIP ALERT – pełna scena 1920x1080 (nad Botrixem) -->
+      <div id="tipAlert" class="box cover-full">
+        <iframe title="Tipply Tip Alert"
+          src="https://widgets.tipply.pl/TIP_ALERT/45acbc83-f00e-41a6-bbcd-4e8078ae7923"
+          allow="autoplay; clipboard-read; clipboard-write"
+          referrerpolicy="no-referrer"
+          allowtransparency="true"></iframe>
+      </div>
+
+      <!-- TOP DONATE – lewy górny róg -->
+      <div id="topDonate" class="box top-left w-wide" style="height: 260px;">
+        <iframe title="Tipply Top Donate"
+          src="https://widgets.tipply.pl/LARGEST_MESSAGES/45acbc83-f00e-41a6-bbcd-4e8078ae7923/7e2ac059-e6d8-448f-8a00-99a8bbd85780"
+          allow="autoplay; clipboard-read; clipboard-write"
+          referrerpolicy="no-referrer"
+          allowtransparency="true"></iframe>
+      </div>
+
+      <!-- LAST DONATE – prawy dolny róg -->
+      <div id="lastDonate" class="box bottom-right w-medium">
+        <iframe title="Tipply Last Donate"
+          src="https://widgets.tipply.pl/LATEST_MESSAGES/45acbc83-f00e-41a6-bbcd-4e8078ae7923/8bb96f04-e8dc-4b7e-8e68-a032c3335840"
+          allow="autoplay; clipboard-read; clipboard-write"
+          referrerpolicy="no-referrer"
+          allowtransparency="true"></iframe>
+      </div>
+
+      <!-- CEL DONATE – lewy dolny róg -->
+      <div id="goal" class="box bottom-left w-small">
+        <iframe title="Tipply Goal"
+          src="https://widgets.tipply.pl/TIPS_GOAL/45acbc83-f00e-41a6-bbcd-4e8078ae7923/GOAL/284aa312-53e1-460c-8424-70880828c41b"
+          allow="autoplay; clipboard-read; clipboard-write"
+          referrerpolicy="no-referrer"
+          allowtransparency="true"></iframe>
+      </div>
+
     </div>
-
-    <!-- TIP ALERT – centrum -->
-    <div id="tipAlert" class="box cover-all">
-      <iframe
-        title="Tipply Tip Alert"
-        src="https://widgets.tipply.pl/TIP_ALERT/45acbc83-f00e-41a6-bbcd-4e8078ae7923"
-        allow="autoplay; clipboard-read; clipboard-write"
-        referrerpolicy="no-referrer"
-        allowtransparency="true"></iframe>
-    </div>
-
-    <!-- TOP DONATE – lewy górny róg, powiększone okno -->
-    <div id="topDonate" class="box top-left w-wide" style="height: 220px;">
-      <iframe
-        title="Tipply Top Donate"
-        src="https://widgets.tipply.pl/LARGEST_MESSAGES/45acbc83-f00e-41a6-bbcd-4e8078ae7923/7e2ac059-e6d8-448f-8a00-99a8bbd85780"
-        allow="autoplay; clipboard-read; clipboard-write"
-        referrerpolicy="no-referrer"
-        allowtransparency="true"></iframe>
-    </div>
-
-    <!-- LAST DONATE – prawy dolny róg -->
-    <div id="lastDonate" class="box bottom-right w-medium">
-      <iframe
-        title="Tipply Last Donate"
-        src="https://widgets.tipply.pl/LATEST_MESSAGES/45acbc83-f00e-41a6-bbcd-4e8078ae7923/8bb96f04-e8dc-4b7e-8e68-a032c3335840"
-        allow="autoplay; clipboard-read; clipboard-write"
-        referrerpolicy="no-referrer"
-        allowtransparency="true"></iframe>
-    </div>
-
-    <!-- CEL DONATE – lewy dolny róg -->
-    <div id="goal" class="box bottom-left w-small">
-      <iframe
-        title="Tipply Goal"
-        src="https://widgets.tipply.pl/TIPS_GOAL/45acbc83-f00e-41a6-bbcd-4e8078ae7923/GOAL/284aa312-53e1-460c-8424-70880828c41b"
-        allow="autoplay; clipboard-read; clipboard-write"
-        referrerpolicy="no-referrer"
-        allowtransparency="true"></iframe>
-    </div>
-
   </div>
+
+  <!-- Skaler: dopasowuje płótno 1920x1080 do okna Yolo/OBS bez zmiany układu wewnątrz iframe -->
+  <script>
+    (function() {
+      const canvas = document.getElementById('canvas');
+      function fit() {
+        const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        const x = (window.innerWidth  - 1920 * scale) / 2;
+        const y = (window.innerHeight - 1080 * scale) / 2;
+        canvas.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+      }
+      window.addEventListener('resize', fit);
+      fit();
+      console.log('Overlay działa w trybie 1080p canvas + scale.');
+    })();
+  </script>
 </body>
 </html>
