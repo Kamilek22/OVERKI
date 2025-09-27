@@ -8,15 +8,11 @@
     html, body { height: 100%; }
     body {
       margin: 0;
-      background: transparent; /* ważne */
+      background: transparent;
       overflow: hidden;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
-    /* --- System współrzędnych 1920x1080 ---
-       Cały layout rysujemy w pikselach sceny 1080p.
-       Potem SKALUJEMY całość JS-em, więc widgety widzą pełne 1920x1080
-       i nie przycinają się wewnątrz. */
     .root { position: fixed; inset: 0; display: grid; place-items: center; }
     .canvas {
       position: relative;
@@ -26,30 +22,24 @@
       background: transparent;
     }
 
-    /* Pudełka – pozycje w przestrzeni 1920x1080 */
     .box { position: absolute; pointer-events: auto; background: transparent; }
 
-    /* ROGI i centrum */
+    /* Rogi i centrum */
     .top-left     { left: 24px;  top: 24px; }
     .bottom-left  { left: 24px;  bottom: 24px; }
     .bottom-right { right: 24px; bottom: 24px; }
     .center       { left: 50%;  top: 50%; transform: translate(-50%, -50%); }
 
-    /* Rozmiary (w pikselach 1080p) */
     .w-medium { width: 620px; height: 160px; }
     .w-wide   { width: 900px; height: 240px; }
     .w-small  { width: 520px; height: 140px; }
 
-    /* Pełny obszar dla animowanych alertów */
-    .cover-full { left: 0; top: 0; width: 1920px; height: 1080px; transform: none; }
+    .cover-full { left: 50%; top: 50%; width: 1920px; height: 1080px; transform: translate(-50%, -50%); }
 
     .box iframe {
       width: 100%; height: 100%; border: 0; background: transparent;
-      /* Wymuszenie braku przycinania po stronie iframe */
-      overflow: visible;
     }
 
-    /* Warstwy */
     #tipAlert  { z-index: 30; }
     #botrix    { z-index: 20; }
     #topDonate { z-index: 10; }
@@ -61,7 +51,7 @@
   <div class="root">
     <div id="canvas" class="canvas">
 
-      <!-- BOTRIX – pełna scena 1920x1080 -->
+      <!-- BOTRIX – wyśrodkowany na pełnym obszarze -->
       <div id="botrix" class="box cover-full">
         <iframe title="Botrix Alerts"
           src="https://botrix.live/alerts?bid=mImY0SOSfEEnIbMs4UPHNg"
@@ -70,11 +60,11 @@
           allowtransparency="true"></iframe>
       </div>
 
-      <!-- TIP ALERT – pełna scena 1920x1080 (nad Botrixem) -->
+      <!-- TIP ALERT – wyśrodkowany na pełnym obszarze -->
       <div id="tipAlert" class="box cover-full">
         <iframe title="Tipply Tip Alert"
           src="https://widgets.tipply.pl/TIP_ALERT/45acbc83-f00e-41a6-bbcd-4e8078ae7923"
-          allow="autoplay; clipboard-read; clipboard-write"
+          allow="autoplay; clipboard-read; clipboard-write; microphone; speakers"
           referrerpolicy="no-referrer"
           allowtransparency="true"></iframe>
       </div>
@@ -109,7 +99,6 @@
     </div>
   </div>
 
-  <!-- Skaler: dopasowuje płótno 1920x1080 do okna Yolo/OBS bez zmiany układu wewnątrz iframe -->
   <script>
     (function() {
       const canvas = document.getElementById('canvas');
@@ -121,7 +110,6 @@
       }
       window.addEventListener('resize', fit);
       fit();
-      console.log('Overlay działa w trybie 1080p canvas + scale.');
     })();
   </script>
 </body>
